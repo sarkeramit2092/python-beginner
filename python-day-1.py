@@ -45,3 +45,8 @@ print ("Your name is " + name1 +" and your are", age)
 
 #Word Replacement Exercise
 
+sentence = input ("Enter Your Sentence: ")
+print ("Your sentence is: ",sentence)
+word1 = input ("Enter the word you want to replace: ")
+world2 = input ("Enter the world to replace it with: ")
+print (sentence.replace(word1,world2))
