@@ -1,0 +1,77 @@
+name: Expo Build
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: |
+          npm install -g expo-cli
+          npm install
+
+      - name: Expo Build
+        run: expo build:android # or expo build:ios
+
+      - name: Archive Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: .expo
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: .expo
+
+      - name: Deploy to Expo
+        run: |
+          expo login -u $EXPO_USERNAME -p $EXPO_PASSWORD
+          expo publish
+        env:
+          EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
+          EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "Expo build successful! View the app here: $EXPO_APP_URL"
+        env:
+          EXPO_APP_URL: ${{ steps.deploy.outputs.expo-app-url }}
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Expo build failed! Check the workflow logs for details."
+
+      - name: Microsoft Teams Notification
+        if: success()
+        uses: MisterPhilip/microsoft-teams-notification@v1
+        with:
+          title: 'Expo Build Notification'
+          summary: 'Expo build successful!'
+          text: 'View the app here: $EXPO_APP_URL'
+          themeColor: '00FF00'
+        env:
+          MS_TEAMS_WEBHOOK: ${{ secrets.MS_TEAMS_WEBHOOK }}
