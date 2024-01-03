@@ -22,4 +22,13 @@ for m in list1:
     sum = sum + m
 print ("Avg:", sum/len(list1))
 
+#table of a given number
+
+table =9
+
+for s in range(1,11):
+    print (s*table)
+
+
+
 
