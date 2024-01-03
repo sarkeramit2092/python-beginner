@@ -27,7 +27,8 @@ print ("Avg:", sum/len(list1))
 table =9
 
 for s in range(1,11):
-    print (s*table)
+    mul= s*table
+    print(table, "*" ,s, "=", mul)
 
 
 
